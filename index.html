@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Multiplayer</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .tooltip-text {
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-right: 10px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip-text.show {
+            opacity: 1;
+        }
+        .btn-floating-group {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body class="bg-dark">
+    <div class="container-fluid py-4 px-4">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1 class="text-center mb-4">YouTube Multiplayer</h1>
+                <div id="videoContainer" class="row g-4 justify-content-center align-items-center" style="min-height: 80vh;">
+                    <!-- Videos will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update floating buttons -->
+    <div class="btn-floating-group">
+        <button id="playAllBtn" class="btn btn-primary btn-lg shadow d-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+            </svg>
+            Play All
+        </button>
+        <button id="unmuteAllBtn" class="btn btn-success btn-lg shadow d-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-up-fill" viewBox="0 0 16 16">
+                <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+                <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+            </svg>
+            Unmute All
+        </button>
+        <button id="shareBtn" class="btn btn-info btn-lg shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share-fill" viewBox="0 0 16 16">
+                <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+            </svg>
+            Share
+            <span class="tooltip-text">Link copied!</span>
+        </button>
+    </div>
+
+    <script>
+        function getVideoIds() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videos = urlParams.get('videos');
+            return videos ? videos.split(',') : [];
+        }
+
+        function getGridClass(totalVideos) {
+            // Define grid classes based on number of videos
+            switch (totalVideos) {
+                case 1:
+                    return 'col-12 col-lg-8 col-xl-6';
+                case 2:
+                    return 'col-12 col-md-6 col-lg-6';
+                case 3:
+                    return 'col-12 col-md-6 col-lg-4';
+                case 4:
+                    return 'col-12 col-md-6 col-lg-6 col-xl-3';
+                case 5:
+                case 6:
+                    return 'col-12 col-md-6 col-lg-4';
+                case 7:
+                case 8:
+                    return 'col-12 col-md-6 col-lg-4 col-xl-3';
+                default:
+                    return 'col-12 col-md-6 col-lg-4 col-xl-3';
+            }
+        }
+
+        function createVideoEmbed(videoId, gridClass) {
+            const colWrapper = document.createElement('div');
+            colWrapper.className = gridClass;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card shadow-sm h-100';
+            
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-0';
+            
+            const videoWrapper = document.createElement('div');
+            videoWrapper.className = 'ratio ratio-16x9';
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=1`;
+            iframe.className = 'border-0 youtube-player';
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            
+            videoWrapper.appendChild(iframe);
+            cardBody.appendChild(videoWrapper);
+            wrapper.appendChild(cardBody);
+            colWrapper.appendChild(wrapper);
+            return colWrapper;
+        }
+
+        function initialize() {
+            const container = document.getElementById('videoContainer');
+            const videoIds = getVideoIds();
+            const playAllBtn = document.getElementById('playAllBtn');
+            const unmuteAllBtn = document.getElementById('unmuteAllBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            
+            if (videoIds.length === 0) {
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-info text-center';
+                alert.innerHTML = `
+                    <h4 class="alert-heading text-dark">No videos found!</h4>
+                    <p class="mb-0 text-dark">Add videos using the URL parameter "videos" with comma-separated YouTube IDs.</p>
+                    <hr>
+                    <p class="mb-0 text-dark">Example: <code>?videos=dQw4w9WgXcQ,jNQXAC9IVRw</code></p>
+                `;
+                container.appendChild(alert);
+                shareBtn.classList.add('d-none');
+                return;
+            }
+
+            const gridClass = getGridClass(videoIds.length);
+
+            videoIds.forEach(videoId => {
+                container.appendChild(createVideoEmbed(videoId, gridClass));
+            });
+
+            // Show control buttons if there are multiple videos
+            if (videoIds.length > 1) {
+                playAllBtn.classList.remove('d-none');
+                //unmuteAllBtn.classList.remove('d-none');
+            }
+        }
+
+        // Load YouTube IFrame API
+        let tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        let firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        let players = [];
+
+        // This function will be called by YouTube API when it's ready
+        function onYouTubeIframeAPIReady() {
+            // Initialize players for all iframes
+            document.querySelectorAll('.youtube-player').forEach((iframe, index) => {
+                players[index] = new YT.Player(iframe, {
+                    events: {
+                        'onReady': onPlayerReady
+                    }
+                });
+            });
+        }
+
+        function onPlayerReady(event) {
+            // Start playing when ready (will be muted)
+            event.target.playVideo();
+        }
+
+        // Update click handlers for buttons
+        document.getElementById('playAllBtn').addEventListener('click', function() {
+            players.forEach(player => {
+                if (player.playVideo) {
+                    player.playVideo();
+                }
+            });
+        });
+
+        document.getElementById('unmuteAllBtn').addEventListener('click', function() {
+            players.forEach(player => {
+                if (player.unMute) {
+                    player.unMute();
+                }
+            });
+            // Change button appearance after unmuting
+            this.classList.replace('btn-success', 'btn-secondary');
+            this.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-mute-fill" viewBox="0 0 16 16">
+                    <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zm7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                Muted
+            `;
+            this.disabled = true;
+        });
+
+        // Add share button functionality
+        document.getElementById('shareBtn').addEventListener('click', async function() {
+            const tooltip = this.querySelector('.tooltip-text');
+            
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                
+                // Show tooltip
+                tooltip.classList.add('show');
+                
+                // Hide tooltip after 2 seconds
+                setTimeout(() => {
+                    tooltip.classList.remove('show');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy URL:', err);
+                tooltip.textContent = 'Failed to copy link';
+                tooltip.classList.add('show');
+                setTimeout(() => {
+                    tooltip.classList.remove('show');
+                    tooltip.textContent = 'Link copied!';
+                }, 2000);
+            }
+        });
+
+        initialize();
+    </script>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
