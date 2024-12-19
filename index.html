@@ -135,31 +135,36 @@
             const unmuteAllBtn = document.getElementById('unmuteAllBtn');
             const shareBtn = document.getElementById('shareBtn');
             
-            if (videoIds.length === 0) {
-                const alert = document.createElement('div');
-                alert.className = 'alert alert-info text-center';
-                alert.innerHTML = `
-                    <h4 class="alert-heading text-dark">No videos found!</h4>
-                    <p class="mb-0 text-dark">Add videos using the URL parameter "videos" with comma-separated YouTube IDs.</p>
-                    <hr>
-                    <p class="mb-0 text-dark">Example: <code>?videos=dQw4w9WgXcQ,jNQXAC9IVRw</code></p>
-                `;
-                container.appendChild(alert);
+            // Create videos section
+            if (videoIds.length > 0) {
+                const gridClass = getGridClass(videoIds.length);
+                videoIds.forEach(videoId => {
+                    container.appendChild(createVideoEmbed(videoId, gridClass));
+                });
+
+                // Show control buttons if there are multiple videos
+                if (videoIds.length > 1) {
+                    playAllBtn.classList.remove('d-none');
+                    //unmuteAllBtn.classList.remove('d-none');
+                }
+            } else {
+                // If no videos, add spacing and hide share button
+                const videoArea = document.createElement('div');
+                videoArea.style.minHeight = '60vh';
+                container.appendChild(videoArea);
                 shareBtn.classList.add('d-none');
-                return;
             }
 
-            const gridClass = getGridClass(videoIds.length);
-
-            videoIds.forEach(videoId => {
-                container.appendChild(createVideoEmbed(videoId, gridClass));
-            });
-
-            // Show control buttons if there are multiple videos
-            if (videoIds.length > 1) {
-                playAllBtn.classList.remove('d-none');
-                //unmuteAllBtn.classList.remove('d-none');
-            }
+            // Always add the description at the bottom
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-info text-center mt-4';
+            alert.innerHTML = `
+                <h4 class="alert-heading text-dark">How to Add Videos</h4>
+                <p class="mb-0 text-dark">Add videos using the URL parameter "videos" with comma-separated YouTube IDs.</p>
+                <hr>
+                <p class="mb-0 text-dark">Example: <code>?videos=dQw4w9WgXcQ,jNQXAC9IVRw</code></p>
+            `;
+            container.appendChild(alert);
         }
 
         // Load YouTube IFrame API
