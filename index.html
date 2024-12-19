@@ -40,8 +40,7 @@
     <div class="container-fluid py-4 px-4">
         <div class="row justify-content-center">
             <div class="col-12">
-                <h1 class="text-center mb-4">YouTube Multiplayer</h1>
-                <div id="videoContainer" class="row g-4 justify-content-center align-items-center" style="min-height: 80vh;">
+                <div id="videoContainer" class="row g-4 justify-content-center align-items-center" style="min-height: 90vh;">
                     <!-- Videos will be inserted here -->
                 </div>
             </div>
@@ -74,8 +73,25 @@
     </div>
 
     <script>
-        function getVideoIds() {
+        async function getVideoIds() {
             const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check for list parameter first
+            const listUrl = urlParams.get('list');
+            if (listUrl) {
+                try {
+                    const response = await fetch(listUrl);
+                    const data = await response.json();
+                    // Flatten the array of arrays and filter out any empty or invalid entries
+                    console.log(data);
+                    return data.flatMap(item => item).filter(id => id);
+                } catch (error) {
+                    console.error('Error fetching video list:', error);
+                    return [];
+                }
+            }
+            
+            // Fall back to videos parameter if list is not present
             const videos = urlParams.get('videos');
             return videos ? videos.split(',') : [];
         }
@@ -128,12 +144,14 @@
             return colWrapper;
         }
 
-        function initialize() {
+        async function initialize() {
             const container = document.getElementById('videoContainer');
-            const videoIds = getVideoIds();
             const playAllBtn = document.getElementById('playAllBtn');
             const unmuteAllBtn = document.getElementById('unmuteAllBtn');
             const shareBtn = document.getElementById('shareBtn');
+            
+            // Get video IDs asynchronously
+            const videoIds = await getVideoIds();
             
             // Create videos section
             if (videoIds.length > 0) {
@@ -160,9 +178,12 @@
             alert.className = 'alert alert-info text-center mt-4';
             alert.innerHTML = `
                 <h4 class="alert-heading text-dark">How to Add Videos</h4>
-                <p class="mb-0 text-dark">Add videos using the URL parameter "videos" with comma-separated YouTube IDs.</p>
+                <p class="mb-0 text-dark">Add videos using either:</p>
                 <hr>
-                <p class="mb-0 text-dark">Example: <code>?videos=dQw4w9WgXcQ,jNQXAC9IVRw</code></p>
+                <p class="mb-0 text-dark">1. URL parameter "videos" with comma-separated YouTube IDs:<br>
+                <code>?videos=dQw4w9WgXcQ,jNQXAC9IVRw</code></p>
+                <p class="mb-0 text-dark">2. URL parameter "list" pointing to an API that returns video IDs:<br>
+                <code>?list=https://api.example.com/videos</code></p>
             `;
             container.appendChild(alert);
         }
@@ -243,7 +264,12 @@
             }
         });
 
-        initialize();
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initialize().catch(error => {
+                console.error('Error initializing application:', error);
+            });
+        });
     </script>
 
     <!-- Bootstrap 5 JS Bundle -->
