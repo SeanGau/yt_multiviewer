@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Multiplayer</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>YouTube Multiplayer</title>
+        <!-- Bootstrap 5 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
         .tooltip-text {
             position: absolute;
             right: 100%;
@@ -34,45 +34,102 @@
             flex-direction: column;
             gap: 10px;
         }
-    </style>
-</head>
-<body class="bg-dark">
-    <div class="container-fluid py-4 px-4">
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div id="videoContainer" class="row g-4 justify-content-center align-items-center" style="min-height: 90vh;">
-                    <!-- Videos will be inserted here -->
+        .github-corner:hover .octo-arm {
+          animation: octocat-wave 560ms ease-in-out;
+        }
+        @keyframes octocat-wave {
+          0%, 100% { transform: rotate(0) }
+          20%, 60% { transform: rotate(-25deg) }
+          40%, 80% { transform: rotate(10deg) }
+        }
+        @media (max-width: 500px) {
+          .github-corner:hover .octo-arm {
+            animation: none;
+          }
+          .github-corner .octo-arm {
+            animation: octocat-wave 560ms ease-in-out;
+          }
+        }
+        </style>
+    </head>
+    <body class="bg-dark">
+        <a
+            href="https://github.com/SeanGau/yt_multiviewer"
+            target="_blank"
+            class="github-corner"
+            aria-label="View source on GitHub"
+        >
+            <svg
+                width="80"
+                height="80"
+                viewBox="0 0 250 250"
+                style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+                aria-hidden="true"
+            >
+                <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+                <path
+                    d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+                    fill="currentColor"
+                    style="transform-origin: 130px 106px;"
+                    class="octo-arm"
+                ></path>
+                <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+            </svg>
+        </a>
+        <div class="container-fluid py-4 px-4">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div id="videoContainer" class="row g-4 justify-content-center align-items-center" style="min-height: 90vh;">
+                        <!-- Videos will be inserted here --></div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Update floating buttons -->
-    <div class="btn-floating-group">
-        <button id="playAllBtn" class="btn btn-primary btn-lg shadow d-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-            </svg>
-            Play All
-        </button>
-        <button id="unmuteAllBtn" class="btn btn-success btn-lg shadow d-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-up-fill" viewBox="0 0 16 16">
-                <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
-                <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
-                <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
-            </svg>
-            Unmute All
-        </button>
-        <button id="shareBtn" class="btn btn-info btn-lg shadow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share-fill" viewBox="0 0 16 16">
-                <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
-            </svg>
-            Share
-            <span class="tooltip-text">Link copied!</span>
-        </button>
-    </div>
-
-    <script>
+        <!-- Update floating buttons -->
+        <div class="btn-floating-group">
+            <button id="playAllBtn" class="btn btn-primary btn-lg shadow d-none">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-play-fill"
+                    viewBox="0 0 16 16"
+                >
+                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                </svg>
+                Play All
+            </button>
+            <button id="unmuteAllBtn" class="btn btn-success btn-lg shadow d-none">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-volume-up-fill"
+                    viewBox="0 0 16 16"
+                >
+                    <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                    <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+                    <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                </svg>
+                Unmute All
+            </button>
+            <button id="shareBtn" class="btn btn-info btn-lg shadow">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-share-fill"
+                    viewBox="0 0 16 16"
+                >
+                    <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+                </svg>
+                Share
+                <span class="tooltip-text">Link copied!</span>
+            </button>
+        </div>
+        <script>
         async function getVideoIds() {
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -269,9 +326,8 @@
                 console.error('Error initializing application:', error);
             });
         });
-    </script>
-
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html> 
+        </script>
+        <!-- Bootstrap 5 JS Bundle -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
